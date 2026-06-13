@@ -29,5 +29,6 @@ export default defineConfig((env) => {
     vite: {
       define: processEnvDefine,
     },
+    nitro: true,
   };
 });
