@@ -12,6 +12,19 @@ import { db } from "./db.js";
 
 const app = new Hono();
 
+app.get("/", (c) =>
+  c.json({
+    status: "running",
+    service: "xeno-channel-simulator",
+    endpoints: {
+      health: "/health",
+      stats: "/stats",
+      send: "/send (POST)",
+      tick: "/tick (POST)"
+    }
+  })
+);
+
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get("/health", (c) =>
   c.json({ ok: true, service: "xeno-channel-simulator", ts: new Date().toISOString() }),
