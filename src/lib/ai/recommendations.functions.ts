@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
-const MODEL = "google/gemini-2.0-flash-exp:free";
+const MODEL = "meta-llama/llama-3.3-70b-instruct:free";
 
 function getModel() {
   return createLovableAiGatewayProvider()(MODEL);
