@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/chat")({
         if (!key) return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
 
         const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("google/gemini-2.5-flash");
+        const model = gateway("google/gemini-2.0-flash-exp:free");
 
         // Lazy import server-only supabase admin
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

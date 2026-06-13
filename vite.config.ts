@@ -7,13 +7,10 @@ const loaded = loadEnv(mode, process.cwd(), "");
 
 // Server-side env vars injected via Vite define so process.env.X works in SSR handlers.
 const SERVER_ENV_VARS = [
-  "OPENROUTER_API_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
   "SUPABASE_URL",
   "SUPABASE_PUBLISHABLE_KEY",
   "SUPABASE_PROJECT_ID",
   "CHANNEL_SIMULATOR_URL",
-  "SIMULATOR_SECRET",
   "PUBLIC_APP_URL",
 ];
 
