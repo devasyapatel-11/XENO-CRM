@@ -30,6 +30,7 @@ Use ₹ for currency. When you recommend a campaign or segment, end with a brief
           system,
           messages: await convertToModelMessages(messages),
           stopWhen: stepCountIs(50),
+          maxTokens: 2048,
           tools: {
             getCustomerStats: tool({
               description: "Get aggregate customer statistics: total count, breakdown by status, city, and CLV tiers.",

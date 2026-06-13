@@ -3,7 +3,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
-const MODEL = "google/gemini-2.0-flash-lite-001";
+const MODEL = "google/gemini-2.5-flash";
 const MAX_TOKENS = 1024;
 
 function getModel() {
