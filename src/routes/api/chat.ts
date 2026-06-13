@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/chat")({
         if (!key) return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
 
         const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("meta-llama/llama-3.3-70b-instruct:free");
+        const model = gateway("google/gemma-4-31b-it:free");
 
         // Lazy import server-only supabase admin
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

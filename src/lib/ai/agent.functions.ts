@@ -6,7 +6,7 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { evaluateRules, type SegmentRules } from "@/lib/crm/segment";
 
-const MODEL = "meta-llama/llama-3.3-70b-instruct:free";
+const MODEL = "google/gemma-4-31b-it:free";
 const MAX_TOKENS = 1024;
 
 function getModel() {
