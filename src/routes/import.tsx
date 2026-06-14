@@ -2,11 +2,12 @@
 // or add individual customers and orders manually.
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
-import { Upload, UserPlus, ShoppingBag, CheckCircle2, AlertTriangle, Download, Loader2 } from "lucide-react";
+import { Upload, UserPlus, ShoppingBag, CheckCircle2, AlertTriangle, Download, Loader2, Check, ChevronsUpDown, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell, PageContainer } from "@/components/layout/AppShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -304,6 +305,8 @@ function AddOrderForm({ onSuccess }: { onSuccess: () => void }) {
     order_date: "",
   });
   const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const triggerCreateOrder = useServerFn(createOrder);
 
   const { data: customers = [] } = useQuery({
@@ -315,6 +318,12 @@ function AddOrderForm({ onSuccess }: { onSuccess: () => void }) {
   });
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const selectedCustomer = customers.find((c) => c.id === form.customer_id);
+  const filteredCustomers = customers.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const submit = async () => {
     if (!form.customer_id) {
@@ -371,20 +380,72 @@ function AddOrderForm({ onSuccess }: { onSuccess: () => void }) {
         <CardDescription>Log an order for an existing shopper in your CRM.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div>
+        <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-muted-foreground">Select customer *</label>
-          <Select value={form.customer_id} onValueChange={(v) => set("customer_id", v)}>
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Choose a customer…" />
-            </SelectTrigger>
-            <SelectContent>
-              {customers.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name} ({c.email})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between mt-1 text-left font-normal"
+              >
+                {selectedCustomer ? (
+                  <span className="truncate">
+                    {selectedCustomer.name} ({selectedCustomer.email})
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">Choose a customer…</span>
+                )}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+              <div className="flex flex-col h-[300px]">
+                <div className="flex items-center border-b px-3 py-2 shrink-0">
+                  <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <input
+                    type="text"
+                    placeholder="Search shopper name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex h-8 w-full rounded-md bg-transparent text-sm outline-none placeholder:text-muted-foreground border-none focus:ring-0 focus:outline-none"
+                  />
+                </div>
+                <div className="flex-1 overflow-y-auto p-1 space-y-0.5 min-h-0">
+                  {filteredCustomers.map((c) => {
+                    const isSelected = form.customer_id === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          set("customer_id", c.id);
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          "w-full flex items-center justify-between rounded-sm px-2 py-1.5 text-sm outline-none transition text-left cursor-pointer",
+                          isSelected
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-accent hover:text-accent-foreground"
+                        )}
+                      >
+                        <div className="truncate pr-4">
+                          <span className="font-medium block text-xs">{c.name}</span>
+                          <span className={cn("text-[10px] block", isSelected ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                            {c.email}
+                          </span>
+                        </div>
+                        {isSelected && <Check className="h-3.5 w-3.5 shrink-0" />}
+                      </button>
+                    );
+                  })}
+                  {filteredCustomers.length === 0 && (
+                    <div className="py-6 text-center text-sm text-muted-foreground">No customer found.</div>
+                  )}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
