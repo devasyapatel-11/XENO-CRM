@@ -3,7 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { Upload, UserPlus, ShoppingBag, CheckCircle2, AlertTriangle, Download, Loader2, Check, ChevronsUpDown, Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell, PageContainer } from "@/components/layout/AppShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -84,6 +84,7 @@ function parseOrdersCSV(text: string): ParsedOrder[] {
 
 // ─── Customer Forms ──────────────────────────────────────────────────────────
 function AddCustomerForm({ onSuccess }: { onSuccess: () => void }) {
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     name: "", email: "", phone: "", city: "", age: "",
     total_spend: "", status: "Active",
@@ -114,6 +115,10 @@ function AddCustomerForm({ onSuccess }: { onSuccess: () => void }) {
     } else {
       toast.success(`${form.name} added successfully`);
       setForm({ name: "", email: "", phone: "", city: "", age: "", total_spend: "", status: "Active" });
+      queryClient.invalidateQueries({ queryKey: ["customers-list-simple"] });
+      queryClient.invalidateQueries({ queryKey: ["customers-with-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       onSuccess();
     }
   };
@@ -156,6 +161,7 @@ function AddCustomerForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 function CustomerCSVUpload({ onSuccess }: { onSuccess: (count: number) => void }) {
+  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<ParsedCustomer[]>([]);
   const [importing, setImporting] = useState(false);
@@ -201,6 +207,10 @@ function CustomerCSVUpload({ onSuccess }: { onSuccess: (count: number) => void }
     setImporting(false);
     setResult({ imported, errors });
     setPreview([]);
+    queryClient.invalidateQueries({ queryKey: ["customers-list-simple"] });
+    queryClient.invalidateQueries({ queryKey: ["customers-with-orders"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["customers"] });
     onSuccess(imported);
     if (errors === 0) toast.success(`Imported ${imported} customers`);
     else toast.warning(`Imported ${imported}, ${errors} errors`);
@@ -295,6 +305,7 @@ function CustomerCSVUpload({ onSuccess }: { onSuccess: (count: number) => void }
 
 // ─── Orders Forms ────────────────────────────────────────────────────────────
 function AddOrderForm({ onSuccess }: { onSuccess: () => void }) {
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     customer_id: "",
     amount: "",
@@ -363,6 +374,11 @@ function AddOrderForm({ onSuccess }: { onSuccess: () => void }) {
         payment_status: "Paid",
         order_date: "",
       });
+      queryClient.invalidateQueries({ queryKey: ["orders-page"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["customers-with-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["customers-list-simple"] });
       onSuccess();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to add order");
@@ -502,6 +518,7 @@ function AddOrderForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 function OrderCSVUpload({ onSuccess }: { onSuccess: (count: number) => void }) {
+  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<ParsedOrder[]>([]);
   const [importing, setImporting] = useState(false);
@@ -543,6 +560,11 @@ function OrderCSVUpload({ onSuccess }: { onSuccess: (count: number) => void }) {
         errors: res.errorsCount,
       });
       setPreview([]);
+      queryClient.invalidateQueries({ queryKey: ["orders-page"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["customers-list-simple"] });
+      queryClient.invalidateQueries({ queryKey: ["customers-with-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       onSuccess(res.imported);
 
       if (res.errorsCount === 0) {
