@@ -13,27 +13,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/orders")({ component: OrdersPage });
 
 function OrdersPage() {
-  const { data, isLoading } = useQuery({
+  const { data: orders = [], isLoading } = useQuery({
     queryKey: ["orders-page"],
     queryFn: async () => {
-      const [o, c] = await Promise.all([
-        supabase.from("orders").select("*").order("order_date", { ascending: false }),
-        supabase.from("customers").select("id,name,email"),
-      ]);
-      return { orders: o.data ?? [], customers: c.data ?? [] };
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*, customers(id,name,email)")
+        .order("order_date", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
     },
   });
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("all");
 
-  const orders = data?.orders ?? [];
-  const custMap = useMemo(() => new Map((data?.customers ?? []).map((c) => [c.id, c])), [data]);
   const categories = useMemo(() => Array.from(new Set(orders.map((o) => o.category))).sort(), [orders]);
 
   const filtered = orders.filter((o) => {
     if (cat !== "all" && o.category !== cat) return false;
     if (q) {
-      const cust = custMap.get(o.customer_id);
+      const cust = o.customers as unknown as { name: string; email: string } | null;
       const ql = q.toLowerCase();
       return o.product_name.toLowerCase().includes(ql) || (cust?.name ?? "").toLowerCase().includes(ql) || o.id.includes(ql);
     }
@@ -81,7 +80,7 @@ function OrdersPage() {
               </thead>
               <tbody>
                 {filtered.slice(0, 50).map((o) => {
-                  const cust = custMap.get(o.customer_id);
+                  const cust = o.customers as unknown as { name: string; email: string } | null;
                   return (
                     <tr key={o.id} className="border-t hover:bg-muted/30">
                       <td className="px-5 py-3 font-mono text-xs">#{o.id.slice(0, 8)}</td>
