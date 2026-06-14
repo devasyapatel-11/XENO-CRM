@@ -1,13 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const MODEL = "google/gemma-4-31b-it:free";
 const MAX_TOKENS = 1024;
 
 function getModel() {
-  return createLovableAiGatewayProvider()(MODEL);
+  return createAiGatewayProvider()(MODEL);
 }
 
 const SegmentInput = z.object({ prompt: z.string().min(3) });

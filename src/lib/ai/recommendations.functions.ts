@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const MODEL = "google/gemma-4-31b-it:free";
 
 function getModel() {
-  return createLovableAiGatewayProvider()(MODEL);
+  return createAiGatewayProvider()(MODEL);
 }
 
 async function snapshot() {

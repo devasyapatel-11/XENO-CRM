@@ -26,7 +26,7 @@ export function createAiProvider(apiKey: string) {
 }
 
 // Called by all AI functions — picks up the key automatically
-export const createLovableAiGatewayProvider = (_unused?: string) => {
+export const createAiGatewayProvider = (_unused?: string) => {
   const key = getApiKey();
   return createAiProvider(key);
 };

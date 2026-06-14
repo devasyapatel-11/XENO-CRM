@@ -3,14 +3,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { evaluateRules, type SegmentRules } from "@/lib/crm/segment";
 
 const MODEL = "google/gemma-4-31b-it:free";
 const MAX_TOKENS = 1024;
 
 function getModel() {
-  return createLovableAiGatewayProvider()(MODEL);
+  return createAiGatewayProvider()(MODEL);
 }
 
 type Step = {

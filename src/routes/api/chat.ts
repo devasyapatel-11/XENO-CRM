@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, tool, stepCountIs, type UIMessage } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/chat")({
         const key = process.env.OPENROUTER_API_KEY;
         if (!key) return new Response("Missing OPENROUTER_API_KEY", { status: 500 });
 
-        const gateway = createLovableAiGatewayProvider(key);
+        const gateway = createAiGatewayProvider(key);
         const model = gateway("google/gemma-4-31b-it:free");
 
         // Lazy import server-only supabase admin
