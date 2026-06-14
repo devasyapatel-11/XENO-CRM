@@ -25,11 +25,11 @@ type Step = {
 
 const STEP_LABELS = [
   { id: "audience", label: "Identify best audience" },
-  { id: "segment",  label: "Create customer segment" },
-  { id: "channel",  label: "Recommend channel" },
-  { id: "message",  label: "Generate campaign message" },
+  { id: "segment", label: "Create customer segment" },
+  { id: "channel", label: "Recommend channel" },
+  { id: "message", label: "Generate campaign message" },
   { id: "estimate", label: "Estimate audience & performance" },
-  { id: "ready",    label: "Ready for approval" },
+  { id: "ready", label: "Ready for approval" },
 ];
 
 function newSteps(): Step[] {
@@ -74,7 +74,7 @@ export const executeAgent = createServerFn({ method: "POST" })
     const { text: audText } = await generateText({
       model: getModel(),
       system: "You are an AI marketing strategist. Describe the ideal target audience in 2-3 sentences. Reply with ONLY a short paragraph.",
-      prompt: `Goal: ${goal}\nCustomers: ${JSON.stringify({ total, byStatus: customers?.reduce<Record<string,number>>((a,c) => { a[c.status]=(a[c.status]??0)+1; return a; }, {}) })}`,
+      prompt: `Goal: ${goal}\nCustomers: ${JSON.stringify({ total, byStatus: customers?.reduce<Record<string, number>>((a, c) => { a[c.status] = (a[c.status] ?? 0) + 1; return a; }, {}) })}`,
       maxTokens: MAX_TOKENS,
     });
     await patchStep(runId, "audience", { status: "done", reasoning: audText, output: { description: audText }, finished_at: new Date().toISOString() });
@@ -108,7 +108,7 @@ export const executeAgent = createServerFn({ method: "POST" })
       cur.sent += m.sent; cur.converted += m.converted; cur.revenue += Number(m.revenue);
       ch[c.channel] = cur;
     }
-    const best = Object.entries(ch).sort((a, b) => (b[1].sent ? b[1].converted/b[1].sent : 0) - (a[1].sent ? a[1].converted/a[1].sent : 0))[0]?.[0] ?? "WhatsApp";
+    const best = Object.entries(ch).sort((a, b) => (b[1].sent ? b[1].converted / b[1].sent : 0) - (a[1].sent ? a[1].converted / a[1].sent : 0))[0]?.[0] ?? "WhatsApp";
     await patchStep(runId, "channel", { status: "done", reasoning: `Picked ${best} based on historical conversion.`, output: { channel: best }, finished_at: new Date().toISOString() });
 
     // Step 4: message
@@ -134,7 +134,7 @@ Reply JSON ONLY: {"name":"campaign name","subject":"or null","message":"body","c
     const expectedRevenue = Math.round(expectedConv * avgRev);
     await patchStep(runId, "estimate", {
       status: "done",
-      reasoning: `At ${(convRate*100).toFixed(1)}% conversion, ~${expectedConv} customers → ₹${expectedRevenue.toLocaleString("en-IN")}.`,
+      reasoning: `At ${(convRate * 100).toFixed(1)}% conversion, ~${expectedConv} customers → ₹${expectedRevenue.toLocaleString("en-IN")}.`,
       output: { audience_size: matched.length, expected_conversions: expectedConv, expected_revenue: expectedRevenue },
       finished_at: new Date().toISOString(),
     });
